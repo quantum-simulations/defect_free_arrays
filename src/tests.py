@@ -16,9 +16,14 @@ class BenchmarkTester:
         os.makedirs(save_dir, exist_ok=True)
         self.save_dir = save_dir
 
+
     def benchmark_time_heatmap_sizes(self, min_size=2, max_size=20, runs=20):
         sizes = list(range(min_size, max_size + 1))
         heatmap = np.zeros((len(sizes), len(sizes)))
+
+        filename = os.path.join(self.save_dir, f"heatmap_min{min_size}_max{max_size}_runs{runs}reservoir{self.grid_size}.csv")
+        with open(filename, "w") as f:
+            f.write("res atoms,target atoms,assignment time (ms)\n")
 
         for i, reservoir_size in enumerate(tqdm(sizes, desc="Reservoir size")):
             for j, target_size in enumerate(sizes):
@@ -49,29 +54,30 @@ class BenchmarkTester:
 
                 heatmap[i, j] = np.mean(times)
 
-        filename = os.path.join(self.save_dir, f"heatmap_min{min_size}_max{max_size}.csv")
-        with open(filename, "w") as f:
-            f.write("x,y,colormap\n")
-            for i, reservoir_size in enumerate(sizes):
-                for j, target_size in enumerate(sizes):
-                    value = heatmap[i, j]
-                    if not np.isnan(value):
-                        x = reservoir_size ** 2
-                        y = target_size ** 2
-                        f.write(f"{x},{y},{value:.6f}\n")       
+                # Write the result for this (i, j) immediately
+                value = heatmap[i, j]
+                if not np.isnan(value):
+                    x = reservoir_size ** 2
+                    y = target_size ** 2
+                    with open(filename, "a") as f:
+                        f.write(f"{x},{y},{value:.6f}\n")
         return sizes, heatmap
 
     def benchmark_time_heatmap_occupancy_targetsize(self, reservoir_size, target_range, occupancy_range, runs=20):
         heatmap = np.zeros((len(target_range), len(occupancy_range)))
 
+        filename = os.path.join(self.save_dir, f"occupancy_map_res{reservoir_size}_runs{runs}.csv")
+        with open(filename, "w") as f:
+            f.write("target atoms,occupancy,assignment time (ms)\n")
+
         for i, target_size in enumerate(tqdm(target_range, desc="Target size")):
-            for j, occ in enumerate(occupancy_range):
+            for j, occupancy in enumerate(occupancy_range):
                 times = []
                 for _ in range(runs):
                     data_gen = DataGenerator(
                         grid_size=self.grid_size,
                         target_size=target_size,
-                        occupancy=occ,
+                        occupancy=occupancy
                     )
                     atom_positions1 = data_gen.get_atom_positions()
                     atom_positions2 = data_gen.get_target_positions()
@@ -92,22 +98,22 @@ class BenchmarkTester:
 
                 heatmap[i, j] = np.mean(times)
 
-        filename = os.path.join(self.save_dir, f"heatmapvsocc_res{reservoir_size}.csv")
-        with open(filename, "w") as f:
-            f.write("x,y,colormap\n")
-            for i, target_size in enumerate(target_range):
-                for j, occ in enumerate(occupancy_range):
-                    value = heatmap[i, j]
-                    if not np.isnan(value):
-                        x = target_size ** 2
-                        y = occ
+                # Write the result for this (i, j) immediately
+                value = heatmap[i, j]
+                if not np.isnan(value):
+                    x = target_size ** 2
+                    y = occupancy
+                    with open(filename, "a") as f:
                         f.write(f"{x},{y},{value:.6f}\n")
         return target_range, occupancy_range, heatmap
-    
 
     def benchmark_assignment_time_vs_target_atoms(self, reservoir_size, target_range, occupancy=1.0, runs=20):
         means = []
         stds = []
+
+        filename = os.path.join(self.save_dir, f"target_vs_time_res{reservoir_size}_runs{runs}.csv")
+        with open(filename, "w") as f:
+            f.write("x,y,error\n")
 
         for target_size in tqdm(target_range, desc="Target size"):
             times = []
@@ -134,20 +140,18 @@ class BenchmarkTester:
                 end = time.perf_counter()
                 times.append((end - start) * 1000)
 
-            means.append(np.mean(times))
-            stds.append(np.std(times))
+            mean = np.mean(times)
+            std = np.std(times)
+            means.append(mean)
+            stds.append(std)
 
-        # Save as CSV
-        filename = os.path.join(self.save_dir, f"target_vs_time_res{reservoir_size}.csv")
-        with open(filename, "w") as f:
-            f.write("x,y,error\n")
-            for tsize, mean, std in zip(target_range, means, stds):
-                x = tsize ** 2
-                y = mean
+            # Write the result for this target_size immediately
+            x = target_size ** 2
+            y = mean
+            with open(filename, "a") as f:
                 f.write(f"{x},{y},{std:.6f}\n")
 
         return target_range, means, stds
-
 
 class BenchmarkPlotter:
     def __init__(self):
@@ -170,7 +174,7 @@ class BenchmarkPlotter:
         plt.tight_layout()
         if save_path:
             plt.savefig(save_path)
-        plt.show()
+        # plt.show()
 
     def time_heatmap_occupancy(self, target_range, occupancy_range, heatmap,
                            title="Assignment Time vs Target and Occupancy",
@@ -189,7 +193,7 @@ class BenchmarkPlotter:
         plt.tight_layout()
         if save_path:
             plt.savefig(save_path)
-        plt.show()
+        # plt.show()
 
     def time_vs_size(self, target_range, means, stds,
                              title="Assignment Time vs Target Size",
@@ -207,6 +211,6 @@ class BenchmarkPlotter:
         plt.tight_layout()
         if save_path:
             plt.savefig(save_path)
-        plt.show()
+        # plt.show()
 
 
