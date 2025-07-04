@@ -14,12 +14,7 @@ if __name__ == "__main__":
     # sizes, heatmap = tester.benchmark_time_heatmap_sizes(min_size=2, max_size=70, runs=200)
     # plotter.time_heatmap_size(sizes, heatmap, save_path="assets/benchmark_results/size_heatmap.pdf")
 
-    # Benchmark 2: assignment time heatmap as a function of target size and occupancy
-    reservoir_size = 400
-    target_range = list(range(2, 81))
-    occupancy_range = np.round(np.linspace(0.1, 1.0, 10), 2)
-    target_sizes, occs, occ_heatmap = tester.benchmark_time_heatmap_occupancy_targetsize(reservoir_size, target_range, occupancy_range)
-    plotter.time_heatmap_occupancy(target_sizes, occs, occ_heatmap, save_path="assets/benchmark_results/occupancy_map.pdf")
+
 
     # Benchmark 3: assignment time vs. target size (with error bars)
     reservoir_size = 140
@@ -29,13 +24,19 @@ if __name__ == "__main__":
         reservoir_size=reservoir_size,
         target_range=target_range,
         occupancy=occupancy,
-        runs=200
+        runs=200000
     )
     plotter.time_vs_size(
         target_sizes, means, stds,
-        save_path="assets/benchmark_results/target_vs_time.pdf"
+        save_path="assets/benchmark_results/target_vs_time2000.pdf"
     ) 
 
+    # Benchmark 2: assignment time heatmap as a function of target size and occupancy
+    # reservoir_size = 400
+    # target_range = list(range(2, 81))
+    # occupancy_range = np.round(np.linspace(0.1, 1.0, 10), 2)
+    # target_sizes, occs, occ_heatmap = tester.benchmark_time_heatmap_occupancy_targetsize(reservoir_size, target_range, occupancy_range)
+    # plotter.time_heatmap_occupancy(target_sizes, occs, occ_heatmap, save_path="assets/benchmark_results/occupancy_map.pdf")
 
 
 
