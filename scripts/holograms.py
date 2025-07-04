@@ -24,7 +24,7 @@ STEPS = 20  # Número de interpolaciones
 SYSTEM_SIZE_UM = GRID_SIZE * GRID_SPACING  # Tamaño total del sistema en micrómetros
 
 # Parámetros del holograma
-HOLOGRAM_SIZE = (512, 512)  # Tamaño del holograma
+HOLOGRAM_SIZE = (64,64)  # Tamaño del holograma
 HOLOGRAM_ITERATIONS = 20  # Iteraciones para el algoritmo GS
 HOLOGRAM_PHYSICAL_SIZE_UM = 200.0  # Tamaño físico del holograma en micrómetros
 HOLOGRAM_PIXEL_SIZE_UM = HOLOGRAM_PHYSICAL_SIZE_UM / HOLOGRAM_SIZE[0]  # Tamaño de pixel en μm
