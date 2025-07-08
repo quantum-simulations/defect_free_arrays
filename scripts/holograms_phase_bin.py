@@ -19,7 +19,7 @@ GRID_SPACING = 5.0   # Separación entre puntos del grid en micrómetros
 BLOCKS = 2  # Número de bloques en cada dirección
 GRID_SIZE = 40 # Tamaño del grid (número de puntos)
 OCCUPANCY = 0.65 # Porcentaje de ocupación del array inicial
-TARGET_SIZE = 25 # Tamaño del array objetivo (número de puntos)
+TARGET_SIZE = 20 # Tamaño del array objetivo (número de puntos)
 ALPHA = 2 # Parámetro de la función de costo
 STEPS = 20  # Número de interpolaciones
 SYSTEM_SIZE_UM = GRID_SIZE * GRID_SPACING  # Tamaño total del sistema en micrómetros
@@ -153,8 +153,10 @@ def compute_hologram(positions, hologram_size, grid_size, iterations=10, initial
         holo = Hologram(target=target, slm_shape=hologram_size)
           
     # Optimizar el holograma
-    holo.optimize(method="WGS-Kim", maxiter=iterations, verbose=False) #stat_groups=["computational"]
-    
+    start_time = time.perf_counter()
+    holo.optimize(method="GS", maxiter=iterations, verbose=False) #stat_groups=["computational"]
+    end_time = time.perf_counter()
+    print(f"Tiempo de optimización del holograma: {end_time - start_time:.2f} segundos")
     # Obtener resultados
     phase = holo.get_phase()
     recovered_intensity = math.sqrt(HOLOGRAM_SIZE[0] * HOLOGRAM_SIZE[1]) * np.abs(holo.get_farfield())**2

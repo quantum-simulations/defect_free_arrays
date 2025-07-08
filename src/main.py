@@ -7,29 +7,29 @@ from tqdm import tqdm
 from tests import BenchmarkTester, BenchmarkPlotter
 
 if __name__ == "__main__":
-    tester = BenchmarkTester(grid_size=200, alpha=2)   #attention: the reservoir must contain enough atoms to accommodate the target
+    tester = BenchmarkTester(grid_size=300, alpha=2)   #attention: the reservoir must contain enough atoms to accommodate the target
     plotter = BenchmarkPlotter()
 
-    # # Benchmark 1: assignment time heatmap as a function of reservoir size and target size
-    # sizes, heatmap = tester.benchmark_time_heatmap_sizes(min_size=2, max_size=70, runs=200)
-    # plotter.time_heatmap_size(sizes, heatmap, save_path="assets/benchmark_results/size_heatmap.pdf")
+    # Benchmark 1: assignment time heatmap as a function of reservoir size and target size
+    sizes, heatmap = tester.benchmark_time_heatmap_sizes(min_size=2, max_size=80, runs=200)
+    plotter.time_heatmap_size(sizes, heatmap, save_path="assets/benchmark_results/size_heatmap.pdf")
 
     # Benchmark 2: assignment time heatmap as a function of target size and occupancy
-    reservoir_size = 400
-    target_range = list(range(2, 81))
-    occupancy_range = np.round(np.linspace(0.1, 1.0, 10), 2)
-    target_sizes, occs, occ_heatmap = tester.benchmark_time_heatmap_occupancy_targetsize(reservoir_size, target_range, occupancy_range)
-    plotter.time_heatmap_occupancy(target_sizes, occs, occ_heatmap, save_path="assets/benchmark_results/occupancy_map.pdf")
+    # reservoir_size = 400
+    # target_range = list(range(2, 81))
+    # occupancy_range = np.round(np.linspace(0.1, 1.0, 10), 2)
+    # target_sizes, occs, occ_heatmap = tester.benchmark_time_heatmap_occupancy_targetsize(reservoir_size, target_range, occupancy_range)
+    # plotter.time_heatmap_occupancy(target_sizes, occs, occ_heatmap, save_path="assets/benchmark_results/occupancy_map.pdf")
 
     # Benchmark 3: assignment time vs. target size (with error bars)
-    reservoir_size = 140
-    target_range = list(range(2, 81))
+    reservoir_size = 400
+    target_range = list(range(2, 91))
     occupancy = 0.65
     target_sizes, means, stds = tester.benchmark_assignment_time_vs_target_atoms(
         reservoir_size=reservoir_size,
         target_range=target_range,
         occupancy=occupancy,
-        runs=200
+        runs=300
     )
     plotter.time_vs_size(
         target_sizes, means, stds,

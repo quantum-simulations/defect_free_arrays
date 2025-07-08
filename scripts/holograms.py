@@ -155,7 +155,10 @@ def compute_hologram(positions, hologram_size, spot_sigma, grid_size, iterations
     
     # Inicializar y optimizar el holograma
     holo = Hologram(target=target)
+    start_time = time.perf_counter()
     holo.optimize(method="WGS-Kim", maxiter=iterations, verbose=True)
+    end_time = time.perf_counter()
+    print(f"Tiempo de optimización del holograma: {end_time - start_time:.2f} segundos")
     
     # Obtener resultados
     phase = holo.get_phase()
